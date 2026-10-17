@@ -1,0 +1,38 @@
+name: Build FixRAC AI APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download repository
+        uses: actions/checkout@v4
+
+      - name: Extract Android project
+        run: |
+          unzip -o FixRAC_AI_Android_Project.zip -d project
+          ls -la project
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Build APK
+        run: |
+          cd project/FixRAC_AI_Android_Project
+          chmod +x gradlew || true
+          gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: FixRAC-AI-APK
+          path: project/FixRAC_AI_Android_Project/app/build/outputs/apk/debug/*.apk
